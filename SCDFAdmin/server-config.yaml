@@ -1,0 +1,17 @@
+spring:
+  cloud:
+    dataflow:
+      task:
+        platform:
+          kubernetes:
+            accounts:
+              default:
+                limits:
+                  memory: 1024Mi
+  datasource:
+    url: jdbc:oracle:thin:@datasource_url
+    username: username
+    password: PASSWORD
+    driverClassName: oracle.jdbc.OracleDriver
+    testOnBorrow: true
+    validationQuery: "SELECT 1"
