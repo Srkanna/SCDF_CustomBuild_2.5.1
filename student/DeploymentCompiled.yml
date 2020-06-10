@@ -1,0 +1,132 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  annotations:
+    deployment.kubernetes.io/desired-replicas: '1'
+    deployment.kubernetes.io/max-replicas: '2'
+    deployment.kubernetes.io/revision: '2'
+  creationTimestamp: '2020-06-10T10:28:48Z'
+  generation: 5
+  labels:
+    app: scdf-server
+    pod-template-hash: '2488234478'
+  name: scdf-server-68dd6788cd
+  namespace: batch
+  ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Deployment
+      name: scdf-server
+      uid: 1cb1cb7c-a4be-11ea-8070-001a4a1a0116
+  resourceVersion: '113956638'
+  selfLink: /apis/apps/v1/namespaces/batch/replicasets/scdf-server-68dd6788cd
+  uid: 2b974edd-ab05-11ea-8cfa-001a4a1a0118
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: scdf-server
+      pod-template-hash: '2488234478'
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: scdf-server
+        pod-template-hash: '2488234478'
+    spec:
+      containers:
+        - env:
+            - name: KUBERNETES_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.namespace
+            - name: SERVER_PORT
+              value: '80'
+            - name: SPRING_CLOUD_CONFIG_ENABLED
+              value: 'false'
+            - name: SPRING_CLOUD_DATAFLOW_FEATURES_ANALYTICS_ENABLED
+              value: 'true'
+            - name: SPRING_CLOUD_DATAFLOW_FEATURES_SCHEDULES_ENABLED
+              value: 'true'
+            - name: SPRING_CLOUD_DATAFLOW_TASK_COMPOSED_TASK_RUNNER_URI
+              value: >-
+                docker://springcloud/spring-cloud-dataflow-composed-task-runner:2.6.0.BUILD-SNAPSHOT
+            - name: SPRING_CLOUD_KUBERNETES_CONFIG_ENABLE_API
+              value: 'false'
+            - name: SPRING_CLOUD_KUBERNETES_SECRETS_ENABLE_API
+              value: 'false'
+            - name: SPRING_CLOUD_KUBERNETES_SECRETS_PATHS
+              value: /etc/secrets
+            - name: SPRING_CLOUD_DATAFLOW_FEATURES_TASKS_ENABLED
+              value: 'true'
+            - name: SPRING_CLOUD_DATAFLOW_SERVER_URI
+              value: 'http://${SCDF_SERVER_SERVICE_HOST}:${SCDF_SERVER_SERVICE_PORT}'
+            - name: SPRING_APPLICATION_JSON
+              value: >-
+                { "maven": { "local-repository": null, "remote-repositories": {
+                "repo1": { "url": "https://repo.spring.io/libs-snapshot"} } } }
+          envFrom:
+            - configMapRef:
+                name: scdf-server
+          image: 'docker-registry.default.svc:5000/batch/scdf-server'
+          imagePullPolicy: Always
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /management/health
+              port: 80
+              scheme: HTTP
+            initialDelaySeconds: 45
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: scdf-server
+          ports:
+            - containerPort: 80
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /management/info
+              port: 80
+              scheme: HTTP
+            initialDelaySeconds: 45
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: '1'
+              memory: 2Gi
+            requests:
+              cpu: 500m
+              memory: 1Gi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+            - mountPath: /config
+              name: config
+              readOnly: true
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: scdf-sa
+      serviceAccountName: scdf-sa
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - configMap:
+            defaultMode: 420
+            items:
+              - key: application.yaml
+                path: application.yaml
+            name: scdf-server
+          name: config
+status:
+  availableReplicas: 1
+  fullyLabeledReplicas: 1
+  observedGeneration: 5
+  readyReplicas: 1
+  replicas: 1

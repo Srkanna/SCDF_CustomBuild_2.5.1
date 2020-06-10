@@ -1,0 +1,38 @@
+apiVersion: v1
+data:
+  application.yaml: |-
+    spring:
+      cloud:
+        dataflow:
+          task:
+            platform:
+              kubernetes:
+                accounts:
+                  default:
+                    limits:
+                      memory: 1024Mi
+                      cpu: 2
+                    entry-point-style: exec
+                    image-pull-policy: always
+      datasource:
+        url: url
+        username: username
+        password: password
+        driver-class-name: oracle.jdbc.OracleDriver
+        testOnBorrow: true
+        validationQuery: "SELECT 1"
+      flyway:
+        enabled: false
+      jpa:
+        hibernate:
+          use-new-id-generator-mappings: true
+kind: ConfigMap
+metadata:
+  creationTimestamp: '2020-06-02T08:08:10Z'
+  labels:
+    app: scdf-server
+  name: scdf-server
+  namespace: facadmin
+  resourceVersion: '113951393'
+  selfLink: /api/v1/namespaces/facadmin/configmaps/scdf-server
+  uid: 3331c73b-a4a8-11ea-8070-001a4a1a0116
